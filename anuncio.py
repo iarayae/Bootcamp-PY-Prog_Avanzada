@@ -5,7 +5,7 @@ class Anuncio:
 
 # Clase Video que hereda de Anuncio
 # Define atributos de clase especificos para el tipo de anuncio "Video"
-class Video(anuncio):
+class Video(Anuncio):
     FORMATO = "Video" # Tipo de formato
     SUB_TIPOS = ("instream", "outstream") # subtipos válidos para anuncios en video
 
