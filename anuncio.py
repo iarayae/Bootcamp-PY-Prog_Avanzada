@@ -1,18 +1,17 @@
 from abc import ABC, abstractmethod
 from error import SubTipoInvalidoError
 
-# Clase base Anuncio
-# Servirá como clase padre para los tipos específicos de anuncios
+# Clase abstracta base para todos los tipos de anuncios
 class Anuncio(ABC):
     def __init__(self, ancho, alto, url_archivo, url_clic, sub_tipo):
-        # Asignamos ancho y alto con setter para aplicar validaciones
+        # Se asignan los atributos usando los setters con validación
         self.ancho = ancho
         self.alto = alto
         self.url_archivo = url_archivo
         self.url_clic = url_clic
-        self.sub_tipo = sub_tipo  # validado en setter
+        self.sub_tipo = sub_tipo
 
-    # Getters y setters con encapsulamiento y reglas
+    # Getter y setter para ancho, asegura que sea mayor a cero
     @property
     def ancho(self):
         return self.__ancho
@@ -21,6 +20,7 @@ class Anuncio(ABC):
     def ancho(self, value):
         self.__ancho = value if value > 0 else 1
 
+    # Getter y setter para alto, asegura que sea mayor a cero
     @property
     def alto(self):
         return self.__alto
@@ -29,17 +29,7 @@ class Anuncio(ABC):
     def alto(self, value):
         self.__alto = value if value > 0 else 1
 
-    @property
-    def sub_tipo(self):
-        return self.__sub_tipo
-
-    @sub_tipo.setter
-    def sub_tipo(self, value):
-        # Validamos si el subtipo está dentro de los permitidos según la clase hija
-        if value not in self.__class__.SUB_TIPOS:
-            raise SubTipoInvalidoError(f"Subtipo inválido para {self.__class__.__name__}: {value}")
-        self.__sub_tipo = value
-
+    # Getter y setter para url del archivo del anuncio
     @property
     def url_archivo(self):
         return self.__url_archivo
@@ -48,6 +38,7 @@ class Anuncio(ABC):
     def url_archivo(self, value):
         self.__url_archivo = value
 
+    # Getter y setter para url de redirección al hacer clic
     @property
     def url_clic(self):
         return self.__url_clic
@@ -56,7 +47,18 @@ class Anuncio(ABC):
     def url_clic(self, value):
         self.__url_clic = value
 
-    # Métodos abstractos obligatorios en subclases
+    # Getter y setter para subtipo, validando con SUB_TIPOS de la subclase
+    @property
+    def sub_tipo(self):
+        return self.__sub_tipo
+
+    @sub_tipo.setter
+    def sub_tipo(self, value):
+        if value not in self.__class__.SUB_TIPOS:
+            raise SubTipoInvalidoError(f"Subtipo inválido para {self.__class__.__name__}: {value}")
+        self.__sub_tipo = value
+
+    # Métodos abstractos que deben implementar las subclases
     @abstractmethod
     def comprimir_anuncio(self):
         pass
@@ -65,19 +67,26 @@ class Anuncio(ABC):
     def redimensionar_anuncio(self):
         pass
 
+    # Método de colaboración: muestra los formatos y subtipos disponibles
+    @staticmethod
+    def mostrar_formatos():
+        for clase in [Video, Display, Social]:
+            print(f"FORMATO: {clase.FORMATO}")
+            for subtipo in clase.SUB_TIPOS:
+                print(f"- {subtipo}")
+            print()
+
 
 # Clase Video que hereda de Anuncio
-# Define atributos de clase especificos para el tipo de anuncio "Video"
 class Video(Anuncio):
-    FORMATO = "Video" # Tipo de formato
-    SUB_TIPOS = ("instream", "outstream") # subtipos válidos para anuncios en video
+    FORMATO = "Video"
+    SUB_TIPOS = ("instream", "outstream")
 
     def __init__(self, url_archivo, url_clic, duracion, sub_tipo):
-        # Llama al constructor de la clase padre con valores fijos (ancho=1, alto=1)
+        # Video tiene tamaño fijo: 1x1
         super().__init__(1, 1, url_archivo, url_clic, sub_tipo)
-        # Duración personalizada para videos
-        self.duracion = duracion
-    
+        self.duracion = duracion  # usa setter
+
     @property
     def duracion(self):
         return self.__duracion
@@ -93,14 +102,12 @@ class Video(Anuncio):
         print("RECORTE DE VIDEO NO IMPLEMENTADO AÚN")
 
 
-# Clase Display que hereda tambien de Anuncio
-# Define atributos de clase especificos para el tipo de anuncio "Display"
+# Clase Display que hereda de Anuncio
 class Display(Anuncio):
-    FORMATO = "Display" # Tipo de Formato
-    SUB_TIPOS = ("tradicional", "native") # subtipos validos para este tipo de anuncio
+    FORMATO = "Display"
+    SUB_TIPOS = ("traditional", "native")
 
     def __init__(self, ancho, alto, url_archivo, url_clic, sub_tipo):
-        # Constructor con valores personalizados
         super().__init__(ancho, alto, url_archivo, url_clic, sub_tipo)
 
     def comprimir_anuncio(self):
@@ -111,15 +118,13 @@ class Display(Anuncio):
 
 
 # Clase Social que hereda de Anuncio
-# Define atributos de clase especificos para el tipo de anuncio en redes sociales
 class Social(Anuncio):
     FORMATO = "Social"
     SUB_TIPOS = ("facebook", "linkedin")
 
     def __init__(self, ancho, alto, url_archivo, url_clic, sub_tipo):
-        # Constructor con valores personalizados
         super().__init__(ancho, alto, url_archivo, url_clic, sub_tipo)
-    
+
     def comprimir_anuncio(self):
         print("COMPRESIÓN DE ANUNCIOS DE REDES SOCIALES NO IMPLEMENTADA AÚN")
 
